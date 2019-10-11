@@ -146,12 +146,69 @@ print('이 정도 비율로 공부해보는건 어떨까요?')
 코드에 주석을 추가해서 보는 사람이 더 이해하기 쉽게 도와주었다
 6)내가 기여한 내용의 반영 여부 : (O,X 중 선택해주세요)
 
-[프로젝트 3 : 길 찾기 문제 해결 프로그램의 코드 오류 수정]
-1)연구소 이름 : (공유 파일에서 복붙하세요)
-2)연구소가 해결하려는 문제 : (공유 파일에서 복붙하세요)
-3)연구소의 깃헙 링크 : (공유 파일에서 복붙하세요)
+[프로젝트 3 : 중력 보정을 통한 지형 보정 값 출력]
+1)연구소 이름 : 탈론연구소
+2)연구소가 해결하려는 문제 : 지형 보정값을 구하는데 어려움을 겪고 있는 햄스터 해먼드
+3)연구소의 깃헙 링크 : 
+https://github.com/McCree081318/McCree
 4)내가 기여한 내용
-(코드, 주석, 문서화 등 내가 기여한 내용을 복붙해주세요)
+import csv
+import math as m
+f = open('a.csv', encoding = 'cp949')
+c = csv.reader(f)
+
+city = input("도시를 입력하세요(~도 ~시): ") # 중력보정을 하고 싶은 도시를 입력한다
+alldata = []
+g = 978032.677 # 중력가속도값 정의 
+
+        
+def standardG( o): # 표준 중력
+    sin2 = (m.sin(m.radians(o)))**2
+    return g*(1+0.005278895*sin2+0.000023462*sin2**2)
+
+def freeAirCorrection(h): # 프리에어 보정값 계산 
+    return 0.308*h
+
+def freeAirAnomaly(g, h, o): # 프리에어 이상값 계산 
+    return (g - standardG(o)+freeAirCorrection(h))
+
+def bouguerCorrection(p, h): # 부게 보정값 계산 
+    return 0.0419 * p * h
+
+def bouguerAnomaly(g, h, o, p): # 부게 이상값 계산 
+    return freeAirAnomaly(g, h, o) - bouguerCorrection(p, h)
+
+def terrainCorrection(g, h, o, p, gBC): # 지형 보정값 계산 
+    return gBC - bouguerAnomaly(g,h,o,p)
+
+
+for row in c:
+    if city in row[0]: # 데이터 불러오기 
+        alldata = row
+        wido = float(row[1])
+        kyongdo = float(row[2])
+        godo = float(row[3])
+        g_obs = float(row[4])
+        gb = float(row[5])
+        den = float(row[7])
+        print(alldata)
+        tc = terrainCorrection(g,godo, wido, den, gb)
+        print(tc/1000) # 단위 맞춰주기
+    else:
+        print("데이터가 없쪄용ㅠㅠ") # 입력받은 도시가 데이터에 없을 시 출력 
+        
+for i in c: 
+    l = i
+    location = str(l[0])
+    latitude = float(l[1])
+    longitude = float(l[2])
+    h = float(l[3])
+    g = float(l[4])
+    gBC = float(l[5])
+    stone = str(l[6])
+    p = float(l[7])
+    dgt = terrainCorrection(g, h, latitude, p, gBC) # 최종 중력보정값 출력 
+    print(dgt)
 5)내가 기여한 내용에 대한 설명
-(자신이 어떤 기여를 한 것인지 설명해주세요)
+코드를 이해하기 쉽게 주석을 추가했다. 어떤 과정에서 어떤 보정이 들어가는지 알려주었다.
 6)내가 기여한 내용의 반영 여부 : (O,X 중 선택해주세요)
